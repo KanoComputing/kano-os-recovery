@@ -1,0 +1,30 @@
+#!/bin/bash
+#
+# kano-os-recovery
+#
+# Copyright (C) 2018 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# Repairs a broken system due to APT being interrupted during a kano-updater.
+#
+
+function is_apt_broken()
+{
+    dpkg-query -W -f='${db:Status-Abbrev} ${binary:Package}\n' | grep -E ^.[^nci]
+}
+
+# Does APT report that any packages are in an unstable status?
+is_apt_broken
+if [ $? != 0 ]; then
+
+    # mount file systems read-write (rootfs and boot are needed by dpkg)
+    /bin/mount /dev/mmcblk0p1 /boot
+    /bin/mount -o remount,rw /dev/mmcblk0p2 /
+
+    # tell apt to fix the database by unfolding half-installed/configured packages
+    /usr/bin/dpkg --configure -a
+
+    # restore mount points as they were right before the fix
+    /bin/umount /boot
+    /bin/mount -o remount,ro /dev/mmcblk0p2 /
+fi

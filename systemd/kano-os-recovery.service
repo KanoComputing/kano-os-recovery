@@ -1,0 +1,23 @@
+#
+# kano-os-recovery.service
+#
+# Copyright (C) 2018 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# This systemd service recovers a broken system due to power failure during an upgrade.
+#
+
+[Unit]
+Description=Kano OS Recovery
+DefaultDependencies=no
+After=kano-os-loader.service
+
+[Service]
+StandardOutput=journal+console
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/kano-os-recovery
+TimeoutSec=0
+
+[Install]
+WantedBy=kano-os-loader.service
