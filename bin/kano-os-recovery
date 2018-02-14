@@ -15,7 +15,7 @@ function is_apt_broken()
 
 # Does APT report that any packages are in an unstable status?
 is_apt_broken
-if [ $? != 0 ]; then
+if [ $? == 0 ]; then
 
     # mount file systems read-write (rootfs and boot are needed by dpkg)
     /bin/mount /dev/mmcblk0p1 /boot

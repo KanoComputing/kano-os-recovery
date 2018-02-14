@@ -11,6 +11,7 @@
 Description=Kano OS Recovery
 DefaultDependencies=no
 After=kano-os-loader.service
+Before=systemd-remount-fs.service
 
 [Service]
 StandardOutput=journal
