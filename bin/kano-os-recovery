@@ -7,15 +7,38 @@
 #
 # Repairs a broken system due to APT being interrupted during a kano-updater.
 #
+# Syntax: kano-os-recovery < --info | --recovery | --test >
+#
+# Errorlevel is set to 0 if recovery is needed or has been performed.
+# 1 means system is stable.
+#
 
-function is_apt_broken()
+# Operation mode - if absent, assume information mode
+mode=$1
+
+# Delay in seconds for test mode
+test_sleep=30
+
+if [ `id -u` != 0 ]; then
+    echo "You need to be root"
+    exit 1
+fi
+
+function is_apt_stable()
 {
+    # Query if system has any packages in a broken state.
+    # Return code 0 means system is broken, 1 means stable.
     dpkg-query -W -f='${db:Status-Abbrev} ${binary:Package}\n' | grep -E ^.[^nci]
 }
 
 # Does APT report that any packages are in an unstable status?
-is_apt_broken
-if [ $? == 0 ]; then
+is_apt_stable
+system_stable=$?
+echo "System Stable? $system_stable"
+
+if [ $system_stable != 1 ] && [ "$mode" == "--recovery" ]; then
+
+    echo "Recovery is starting now..."
 
     # mount file systems read-write (rootfs and boot are needed by dpkg)
     /bin/mount /dev/mmcblk0p1 /boot
@@ -27,4 +50,13 @@ if [ $? == 0 ]; then
     # restore mount points as they were right before the fix
     /bin/umount /boot
     /bin/mount -o remount,ro /dev/mmcblk0p2 /
+
+    exit 0
 fi
+
+if [ "$mode" == "--test" ]; then
+    echo "Recovery is in test mode - sleeping for $test_sleep secs"
+    /bin/sleep $test_sleep
+fi
+
+exit $system_stable
