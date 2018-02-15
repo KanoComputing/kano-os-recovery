@@ -47,6 +47,9 @@ if [ $system_stable != 1 ] && [ "$mode" == "--recovery" ]; then
     # tell apt to fix the database by unfolding half-installed/configured packages
     /usr/bin/dpkg --configure -a
 
+    # try to fix broken packages even if previous command was successful
+    /usr/bin/apt-get install --fix-broken --yes
+
     # restore mount points as they were right before the fix
     /bin/umount /boot
     /bin/mount -o remount,ro /dev/mmcblk0p2 /
