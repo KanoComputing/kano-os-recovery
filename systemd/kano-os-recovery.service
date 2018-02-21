@@ -17,7 +17,7 @@ Before=systemd-remount-fs.service
 StandardOutput=journal
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/bin/kano-os-recovery --recovery
+ExecStart=-/usr/bin/kano-os-recovery --recovery
 TimeoutSec=0
 
 [Install]
