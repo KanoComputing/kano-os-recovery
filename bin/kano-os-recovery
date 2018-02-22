@@ -44,6 +44,10 @@ if [ $system_stable != 1 ] && [ "$mode" == "--recovery" ]; then
     /bin/mount /dev/mmcblk0p1 /boot
     /bin/mount -o remount,rw /dev/mmcblk0p2 /
 
+    # We do not want to start init.d services during the recovery.
+    # Several packages have this assumption on their postinst - dnsmasq, dhcpcd5
+    /bin/mount --bind /bin/true /usr/sbin/invoke-rc.d
+
     # tell apt to fix the database by unfolding half-installed/configured packages
     /usr/bin/dpkg --configure -a
 
@@ -51,6 +55,7 @@ if [ $system_stable != 1 ] && [ "$mode" == "--recovery" ]; then
     /usr/bin/apt-get install --fix-broken --yes
 
     # restore mount points as they were right before the fix
+    /bin/umount /usr/sbin/invoke-rc.d
     /bin/umount /boot
     /bin/mount -o remount,ro /dev/mmcblk0p2 /
 
