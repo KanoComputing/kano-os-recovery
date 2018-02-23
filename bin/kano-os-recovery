@@ -40,9 +40,9 @@ if [ $system_stable != 1 ] && [ "$mode" == "--recovery" ]; then
 
     echo "Recovery is starting now..."
 
-    # mount file systems read-write (rootfs and boot are needed by dpkg)
-    /bin/mount /dev/mmcblk0p1 /boot
-    /bin/mount -o remount,rw /dev/mmcblk0p2 /
+    # Prevent apt recovery tasks from starting daemons from package postinst scripts
+    # FIXME: Can we tell systemd to do this for us?
+    /bin/mount --bind /bin/true /usr/sbin/invoke-rc.d
 
     # tell apt to fix the database by unfolding half-installed/configured packages
     /usr/bin/dpkg --configure -a
@@ -50,9 +50,8 @@ if [ $system_stable != 1 ] && [ "$mode" == "--recovery" ]; then
     # try to fix broken packages even if previous command was successful
     /usr/bin/apt-get install --fix-broken --yes
 
-    # restore mount points as they were right before the fix
-    /bin/umount /boot
-    /bin/mount -o remount,ro /dev/mmcblk0p2 /
+    # restore the invoke-rc.d tool
+    /bin/umount /usr/sbin/invoke-rc.d
 
     exit 0
 fi

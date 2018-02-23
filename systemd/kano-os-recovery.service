@@ -6,12 +6,15 @@
 #
 # This systemd service recovers a broken system due to power failure during an upgrade.
 #
+# It runs synchronously between the time systemd has mounted filesystems read-write,
+# and before Plymouth wants to display the bootup screen
+#
 
 [Unit]
 Description=Kano OS Recovery
 DefaultDependencies=no
-After=kano-os-loader.service
-Before=systemd-remount-fs.service
+After=kano-os-loader.service local-fs.target
+Before=plymouth-start.service
 
 [Service]
 StandardOutput=journal
