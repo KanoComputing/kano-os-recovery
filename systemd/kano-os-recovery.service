@@ -6,10 +6,15 @@
 #
 # This systemd service recovers a broken system due to power failure during an upgrade.
 #
-# It runs synchronously between the time systemd has mounted filesystems read-write,
-# and before Plymouth wants to display the bootup screen
+# It runs synchronously between the time systemd has mounted filesystems in read-write mode,
+# and before Plymouth wants to display the bootup screen.
 #
-# To debug this service over a serial console: StandardOutput=journal+console
+# Due to some System-V based packages trying to start daemons during a recovery,
+# we disable dbus-send, and invoke-rc.d tools using fake bind mounts.
+# To enforce reliability, the "unshare" tool is used, to isolate these mounts from the rest of the system.
+#
+# To debug this service over a serial console, set "StandardOutput=journal+console".
+# See the README file for more details.
 #
 
 [Unit]
