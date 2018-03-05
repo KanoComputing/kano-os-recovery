@@ -9,6 +9,8 @@
 # It runs synchronously between the time systemd has mounted filesystems read-write,
 # and before Plymouth wants to display the bootup screen
 #
+# To debug this service over a serial console: StandardOutput=journal+console
+#
 
 [Unit]
 Description=Kano OS Recovery
@@ -20,8 +22,7 @@ Before=plymouth-start.service
 StandardOutput=journal
 Type=oneshot
 RemainAfterExit=yes
-ExecStartPre=/usr/bin/unshare -m /usr/bin/kano-os-recovery-mount
-ExecStart=-/usr/bin/kano-os-recovery --recovery
+ExecStart=-/usr/bin/unshare -m /usr/bin/kano-os-recovery --recovery
 TimeoutSec=0
 
 [Install]

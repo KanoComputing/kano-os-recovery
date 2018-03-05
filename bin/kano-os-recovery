@@ -34,11 +34,20 @@ function is_apt_stable()
 # Does APT report that any packages are in an unstable status?
 is_apt_stable
 system_stable=$?
-echo "System Stable? $system_stable"
+echo "KANO-OS-RECOVERY: Is System Stable? $system_stable"
 
 if [ $system_stable != 1 ] && [ "$mode" == "--recovery" ]; then
 
     echo "Recovery is starting now..."
+
+    # Allow subsequent mounts to propagate to children, but not to the rest of the system
+    /bin/mount --make-slave /
+
+    # Prevent apt recovery tasks from starting daemons through package postinst scripts
+    /bin/mount --bind /bin/true /usr/sbin/invoke-rc.d
+
+    # Also prevent the dbus package postinst scripts from stalling the recovery
+    /bin/mount --bind /bin/true /usr/bin/dbus-send
 
     # tell apt to fix the database by unfolding half-installed/configured packages
     /usr/bin/dpkg --configure -a
