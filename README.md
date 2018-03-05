@@ -45,4 +45,5 @@ BOARD 8 TXD => BOARD 10 RXD
 BOARD 10 RXD => BOARD 8 TXD
 ```
 
-On the debugger Rpi board, either install a serial console program like `minicom`, or call `sudo screen /dev/ttyAMA01`.
+4) On the debugger Rpi board, either install a serial console program like `minicom`, or call `sudo screen /dev/ttyAMA01`.
+5) Make sure that both RPIs have the option `enable_uart=1` on their config.txt files.
