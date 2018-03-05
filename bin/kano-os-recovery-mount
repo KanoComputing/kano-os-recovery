@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# kano-os-recovery-mount
+#
+# Copyright (C) 2018 Kano Computing Ltd.
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+#
+# Prepares an isolated mount namespace for kano-os-recovery to work correctly.
+#
+# You must execute this script with "unshare -m kano-os-recovery-mount"
+# before running kano-os-recovery script.
+#
+
+# Allow subsequent mounts to propagate to children, but not to the rest of the system
+/bin/mount --make-slave /
+
+# Prevent apt recovery tasks from starting daemons through package postinst scripts
+/bin/mount --bind /bin/true /usr/sbin/invoke-rc.d
+
+# Also prevent the dbus package postinst scripts from stalling the recovery
+/bin/mount --bind /bin/true /usr/bin/dbus-send

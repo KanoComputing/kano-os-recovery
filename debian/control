@@ -7,6 +7,6 @@ Build-Depends: debhelper (>= 9)
 
 Package: kano-os-recovery
 Architecture: any
-Depends: ${misc:Depends}, debianutils, kano-os-loader
+Depends: ${misc:Depends}, debianutils, util-linux, kano-os-loader
 Description: Kano system recovery on boot
  Provides an automated mechanism to recover from power failures during upgrades

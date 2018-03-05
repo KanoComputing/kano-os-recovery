@@ -40,21 +40,11 @@ if [ $system_stable != 1 ] && [ "$mode" == "--recovery" ]; then
 
     echo "Recovery is starting now..."
 
-    # Prevent apt recovery tasks from starting daemons from package postinst scripts
-    # Prevent also dbus postinst scripts from stalling the recovery
-    # FIXME: Can we tell systemd to do this for us?
-    /bin/mount --bind /bin/true /usr/sbin/invoke-rc.d
-    /bin/mount --bind /bin/true /usr/bin/dbus-send
-
     # tell apt to fix the database by unfolding half-installed/configured packages
     /usr/bin/dpkg --configure -a
 
     # try to fix broken packages even if previous command was successful
     /usr/bin/apt-get install --fix-broken --yes
-
-    # restore the invoke-rc.d and dbus-send tools
-    /bin/umount /usr/bin/dbus-send
-    /bin/umount /usr/sbin/invoke-rc.d
 
     exit 0
 fi

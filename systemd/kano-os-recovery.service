@@ -20,6 +20,7 @@ Before=plymouth-start.service
 StandardOutput=journal
 Type=oneshot
 RemainAfterExit=yes
+ExecStartPre=/usr/bin/unshare -m /usr/bin/kano-os-recovery-mount
 ExecStart=-/usr/bin/kano-os-recovery --recovery
 TimeoutSec=0
 

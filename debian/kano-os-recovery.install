@@ -1,2 +1,2 @@
 systemd/kano-os-recovery.service /usr/lib/systemd/system
-bin/kano-os-recovery /usr/bin
+bin /usr
