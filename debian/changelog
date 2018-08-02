@@ -1,3 +1,9 @@
+kano-os-recovery (3.16.0-0) unstable; urgency=low
+
+  * Added DEBIAN_FRONTEND=noninteractive to the env as a precaution
+
+ -- Team Kano <dev@kano.me>  Thu, 2 Aug 2018 16:40:08 +0100
+
 kano-os-recovery (3.15.0-0) unstable; urgency=low
 
   * Initial package

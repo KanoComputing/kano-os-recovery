@@ -1,22 +1,23 @@
 #!/bin/bash
-#
+
 # kano-os-recovery
 #
 # Copyright (C) 2018 Kano Computing Ltd.
-# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+# License: http://www.gnu.org/licenses/gpl-2.0.txt GNU GPL v2
 #
 # Repairs a broken system due to APT being interrupted during a kano-updater.
 #
-# Syntax: kano-os-recovery < --info | --recovery | --test >
+# Usage:
+#    kano-os-recovery [--recovery | --test]
 #
 # Errorlevel is set to 0 if recovery is needed or has been performed.
 # 1 means system is stable.
-#
 
-# Operation mode - if absent, assume information mode
+
+# Operation mode - if absent, assume information mode.
 mode=$1
 
-# Delay in seconds for test mode
+# Delay in seconds for test mode.
 test_sleep=30
 
 if [ `id -u` != 0 ]; then
@@ -24,11 +25,13 @@ if [ `id -u` != 0 ]; then
     exit 1
 fi
 
-function is_apt_stable()
-{
-    # Query if system has any packages in a broken state.
-    # Return code 0 means system is broken, 1 means stable.
-    dpkg-query -W -f='${db:Status-Abbrev} ${binary:Package}\n' | grep -E ^.[^nci]
+# Query if system has any packages in a broken state.
+# Return code 0 means system is broken, 1 means stable.
+function is_apt_stable() {
+    # The regex will match the second character in the string that is not
+    # n,c,i or it will match the third character if it's an R.
+    dpkg-query --show --showformat='${db:Status-Abbrev} ${binary:Package}\n' | \
+        grep --extended-regexp "^.[^nci]|^..R"
 }
 
 # Does APT report that any packages are in an unstable status?
@@ -40,20 +43,22 @@ if [ $system_stable != 1 ] && [ "$mode" == "--recovery" ]; then
 
     echo "Recovery is starting now..."
 
-    # Allow subsequent mounts to propagate to children, but not to the rest of the system
+    # Allow subsequent mounts to propagate to children, but not to the
+    # rest of the system.
     /bin/mount --make-slave /
 
-    # Prevent apt recovery tasks from starting daemons through package postinst scripts
+    # Prevent apt recovery tasks from starting daemons through package
+    # postinst scripts.
     /bin/mount --bind /bin/true /usr/sbin/invoke-rc.d
 
-    # Also prevent the dbus package postinst scripts from stalling the recovery
+    # Also prevent the dbus package postinst scripts from stalling the recovery.
     /bin/mount --bind /bin/true /usr/bin/dbus-send
 
-    # tell apt to fix the database by unfolding half-installed/configured packages
-    /usr/bin/dpkg --configure -a
+    # Tell apt to fix the database by unfolding half-installed/configured packages.
+    DEBIAN_FRONTEND=noninteractive /usr/bin/dpkg --configure --pending
 
-    # try to fix broken packages even if previous command was successful
-    /usr/bin/apt-get install --fix-broken --yes
+    # Try to fix broken packages even if previous command was successful.
+    DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get install --fix-broken --yes
 
     exit 0
 fi
